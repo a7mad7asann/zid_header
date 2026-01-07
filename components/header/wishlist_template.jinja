@@ -1,0 +1,91 @@
+<template id="productCardTemplate">
+    <div class="product-item position-relative">
+        <div class="wishlist_container_v">
+            <div class="wishlist_container_v">
+                <span class="add-to-wishlist_ver" data-wishlist-id="">
+                    <span zid-visible-customer="true">
+                        <button zid-visible-wishlist="" class="icon-heart-mask filled"
+                            onclick="addToWishlist(this)"></button>
+                        <button zid-hidden-wishlist="" class="icon-heart-mask" onclick="addToWishlist(this)"></button>
+                    </span>
+                    <a zid-visible-guest="true" class="icon-heart-mask" href="/auth/login"
+                        onclick="event.preventDefault(); handleLoginAction('', false); return false;"></a>
+                    <img class="loader d-none " src="{{ 'spinner.gif' | asset_url }}" width="20" height="20" />
+                </span>
+
+                <button class="remove-from-wishlist-btn" title="{{ _('Remove from wishlist') }}">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <a href="#" class="d-flex justify-content-start">
+            <div class="content_img">
+                <img class="wishlist-product-img" src="" alt="">
+                <span class="product-card-bundle-offer"></span>
+            </div>
+
+            <div class="product_details">
+                <div class="product-title">
+                    <span class="product-name"></span>
+                </div>
+
+                <div class="discription-card product-discription"></div>
+
+                <div class="product-card-rating-wrapper d-none wishlist-rating-wrapper"></div>
+
+                <div class="product-card_price">
+                    <div class="section-product-price">
+                        <div class="product-price">
+                            <span class="product-price-value"></span>
+                        </div>
+                        <div class="product-prev-price-wrapper d-none">
+                            <span class="product-prev-price"></span>
+                            <span class="product-discount text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="add_button_h">
+                    <a class="add_btn_card_hero btn btn-primary add-to-cart-btn" onclick="event.preventDefault();">
+                        <img class="add-to-cart-progress d-none" src="{{ 'spinner.gif' | asset_url }}" width="20"
+                            height="20">
+                        {{ _('add to cart') }}
+                    </a>
+
+                    <div class="wishlist_container_hero">
+                        <span class="add-to-wishlist_h" data-wishlist-id="">
+                            <span zid-visible-customer="true">
+                                <button zid-visible-wishlist="" class="icon-heart-mask filled"
+                                    onclick="addToWishlist(this)"></button>
+                                <button zid-hidden-wishlist="" class="icon-heart-mask"
+                                    onclick="addToWishlist(this)"></button>
+                            </span>
+                            <a zid-visible-guest="true" class="icon-heart-mask" href="/auth/login"
+                                onclick="event.preventDefault(); handleLoginAction('', false); return false;"></a>
+                            <img class="loader d-none" src="{{ 'spinner.gif' | asset_url }}" width="20" height="20" />
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="add_button_v">
+                <a class="add_btn_card_ver btn btn-primary add-to-cart-btn" onclick="event.preventDefault();">
+                    <img class="add-to-cart-progress d-none" src="{{ 'spinner.gif' | asset_url }}" width="20"
+                        height="20">
+                    {{ _('add to cart') }}
+                </a>
+            </div>
+
+        </a>
+    </div>
+</template>
+
+<script>
+    window.WISHLIST_STRINGS = {
+        loading: "{{ _('loading...') }}",
+        noProducts: "{{ _('No products in the wishlist') }}",
+        deleteError: "{{ _('حدث خطأ أثناء الحذف') }}"
+    };
+</script>
+<script src="{{ 'header.js' | asset_url }}"></script>

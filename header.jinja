@@ -1,0 +1,99 @@
+<header section-id="{{ sectionId }}" class="main_header d-flex flex-column">
+  {% set multiple_countries = store.countries | length > 1 %}
+  {% set multiple_languages = store.languages | length > 1 %}
+
+  {% include 'components/header-account-lang-currency.jinja' %}
+  {% include 'components/header-announcement-bar.jinja' %}
+
+  <div class="container">
+    <div class="header-top d-flex justify-content-between align-items-center p-2">
+      <!-- Logo Section -->
+      <div class="logo_side d-flex align-items-center">
+        <a href="javascript:void(0);" onclick="window.slidingMenu.open()"
+          class="ic menu icon-menu-top d-block d-lg-none" tabindex="1">
+          <span class="icon-menu_open_black_24dp-1 header-theme-icon-primary"></span>
+        </a>
+
+        <!-- Desktop logo -->
+        <a href="/" class="d-none d-lg-block" style="height: 100%;">
+          <img src="{{ settings.header_logo or store.logo }}" alt="{{ store.name or _('Logo') }}"
+            style="max-width: {{ settings.logo_max_height or 100 }}px; height:auto;">
+        </a>
+
+        <!-- Mobile logo -->
+        <a href="/" class="d-block d-lg-none" style="height: 100%;">
+          <img src="{{ settings.header_logo_mobile or settings.header_logo or store.logo }}"
+            alt="{{ store.name or _('Logo') }}" style="max-height: {{ settings.logo_max_height or 80 }}px; width:48px;">
+        </a>
+      </div>
+
+      <!-- Menus -->
+      {% include 'components/header-sliding-menu.jinja' %}
+      {% include 'components/header-mega-menu.jinja' %}
+
+      <!-- Header Options -->
+      <div class="header-options d-flex align-items-center" style="gap: 2rem;">
+        {% include 'components/header/search.jinja' %}
+
+        {% include 'components/header/wishlist.jinja' %}
+       
+        {% include 'components/header/cart.jinja' %}
+       
+
+        <button id="themeToggle" style="font-size:24px;border-radius:8px;border:none;cursor:pointer; background: transparent;outline: 0;">
+          🌙
+        </button>
+
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<script>
+(function () {
+  const STORAGE_KEY = 'theme-mode';
+  const root = document.documentElement;
+  const button = document.getElementById('themeToggle');
+  const defaultMode = "{{ settings.colors_theme_mode_options | default('system') }}";
+
+  const getStoredMode = () => {
+    try { return localStorage.getItem(STORAGE_KEY); }
+    catch { return null; }
+  };
+
+  const systemDark = () =>
+    window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+  const resolveMode = (mode) =>
+    mode === 'system' ? (systemDark() ? 'dark' : 'light') : mode;
+
+  const applyTheme = (mode, save = false) => {
+    const applied = resolveMode(mode);
+    root.classList.toggle('dark', applied === 'dark');
+    root.classList.toggle('light', applied === 'light');
+
+    if (button) {
+      button.textContent = applied === 'dark' ? '☀️' : '🌙';
+      button.setAttribute('aria-pressed', applied === 'dark');
+    }
+
+    if (save) {
+      try { localStorage.setItem(STORAGE_KEY, mode); } catch {}
+    }
+  };
+
+  applyTheme(getStoredMode() || defaultMode);
+
+  button?.addEventListener('click', () => {
+    const current = resolveMode(getStoredMode() || defaultMode);
+    applyTheme(current === 'dark' ? 'light' : 'dark', true);
+  });
+
+  window.matchMedia('(prefers-color-scheme: dark)')
+    .addEventListener('change', () => {
+      if (getStoredMode() === 'system') applyTheme('system');
+    });
+})();
+</script>
+

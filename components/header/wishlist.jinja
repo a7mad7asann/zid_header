@@ -1,0 +1,64 @@
+<!-- Wishlist -->
+{% if store.settings.products.wishlist_enabled %}
+    <div class="wishlist-icon">
+        {% if not session.is_guest %}
+            <button type="button" class="wishlist-btn" onclick="openWishlistModal()" aria-label="{{ _('View Wishlist') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12.62 20.81C12.28 20.93 11.72 20.93 11.38 20.81C8.48 19.82 2 15.69 2 8.69001C2 5.60001 4.49 3.10001 7.56 3.10001C9.38 3.10001 10.99 3.98001 12 5.34001C13.01 3.98001 14.63 3.10001 16.44 3.10001C19.51 3.10001 22 5.60001 22 8.69001C22 15.69 15.52 19.82 12.62 20.81Z"
+                        stroke="var(--header-text-color-primary-bg, var(--text-color-primary-bg))" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </button>
+        {% else %}
+            <a href="/auth/login?redirect_to=/wishlist" class="wishlist-btn" aria-label="{{ _('Login to view Wishlist') }}">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <path
+                        d="M12.62 20.81C12.28 20.93 11.72 20.93 11.38 20.81C8.48 19.82 2 15.69 2 8.69001C2 5.60001 4.49 3.10001 7.56 3.10001C9.38 3.10001 10.99 3.98001 12 5.34001C13.01 3.98001 14.63 3.10001 16.44 3.10001C19.51 3.10001 22 5.60001 22 8.69001C22 15.69 15.52 19.82 12.62 20.81Z"
+                        stroke="var(--header-text-color-primary-bg, var(--text-color-primary-bg))" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
+            </a>
+        {% endif %}
+    </div>
+{% endif %}
+
+
+<!-- Wishlist Modal -->
+{% include 'components/header/wishlist_modal.jinja' %}
+
+<!-- Product Card Templatet -->
+{% include 'components/header/wishlist_template.jinja' %}
+
+<script>
+    const isZidReady = () =>
+    window.zid?.account && window.zid?.cart;
+
+    function openWishlistModal() {
+    const modal = document.getElementById('wishlistModal');
+    if (!modal) return;
+
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => modal.classList.add('active'));
+    loadWishlistItems();
+    }
+
+    function closeWishlistModal() {
+    const modal = document.getElementById('wishlistModal');
+    if (!modal) return;
+
+    modal.classList.remove('active');
+    setTimeout(() => {
+        modal.style.display = 'none';
+        document.body.style.overflow = '';
+    }, 300);
+    }
+
+
+    document.addEventListener('DOMContentLoaded', () => {
+    document.querySelector('.wishlist-btn')
+        ?.addEventListener('click', openWishlistModal);
+    });
+</script>
+<script src="{{ 'header.js' | asset_url }}"></script>
