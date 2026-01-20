@@ -88,63 +88,83 @@
 
         const template = document.querySelector("#productCardTemplate");
 
-        products.forEach((product) => {
-          const clone = template.content.cloneNode(true);
+          products.forEach(product => {
+              const clone = template.content.cloneNode(true);
 
-          clone.querySelector(".wishlist-product-img").src =
-            product.main_image?.image?.full_size || product.name;
-          clone.querySelector(".wishlist-product-img").alt = product.name;
+              // --------------------------
+              // ملئ بيانات المنتج
+              // --------------------------
+              const imgEl = clone.querySelector('.wishlist-product-img');
 
-          clone.querySelector(".product-name").textContent = product.name;
-          clone.querySelector(".product-discription").innerHTML =
-            product.short_description || "";
-          clone.querySelector(".product-price-value").textContent =
-            product.formatted_price;
-          clone
-            .querySelectorAll("[data-wishlist-id]")
-            .forEach((el) => (el.dataset.wishlistId = product.id));
+              // 1️⃣ صورة المنتج الأساسية
+              let imageUrl = product.main_image?.image?.full_size;
 
-          clone.querySelectorAll(".add-to-cart-btn").forEach((btn) => {
-            btn.onclick = () => {
-              if (product.has_options || product.has_fields) {
-                window.location.href = `/products/${product.slug}`;
-              } else {
-                zid.cart.addProduct({ product_id: product.id, quantity: 1 });
+              // 2️⃣ thumbnail أول فيديو (YouTube)
+              if (!imageUrl && Array.isArray(product.videos) && product.videos.length) {
+                  imageUrl = product.videos[0]?.image?.full_size;
               }
-            };
-          });
 
-          const removeBtn = clone.querySelector(".remove-from-wishlist-btn");
-          if (removeBtn) {
-            removeBtn.onclick = () => {
-              removeBtn.disabled = true;
+              // 3️⃣ fallback أخير
+              if (!imageUrl && Array.isArray(product.media)) {
+                  const videoMedia = product.media.find(m => m.provider === 'youtube' && m.image);
+                  imageUrl = videoMedia?.image?.full_size;
+              }
 
-              zid.account
-                .removeFromWishlist(product.id)
-                .then(() => {
-                  removeBtn.closest(".product-item")?.remove();
+              // 4️⃣ set image
+              imgEl.src = imageUrl || '/assets/placeholder.png';
+              imgEl.alt = product.name;
 
-                  if (!container.querySelector(".product-item")) {
-                    container.innerHTML = `
-                        <div class="empty">
-                        <i class="fa fa-heart"></i>
-                        <p class="empty-text">  ${noProductsText}</p>
-                        </div>
-                    `;
+
+              clone.querySelector('.product-name').textContent = product.name;
+              clone.querySelector('.product-discription').innerHTML = product.short_description || '';
+              clone.querySelector('.product-price-value').textContent = product.formatted_price;
+              clone.querySelectorAll('[data-wishlist-id]').forEach(el => el.dataset.wishlistId = product.id);
+
+              clone.querySelectorAll('.add-to-cart-btn').forEach(btn => {
+              btn.onclick = () => {
+                  if (product.has_options || product.has_fields) {
+                  window.location.href = `/products/${product.slug}`;
+                  } else {
+                  zid.cart.addProduct({ product_id: product.id, quantity: 1 });
                   }
-                })
-                .catch(() => {
-                  removeBtn.disabled = false;
-                  alert(
-                    strings.deleteError || "An error occurred while removing"
-                  );
-                });
-            };
-          }
+              };
+              });
 
-          container.appendChild(clone);
-        });
-      })
+              // --------------------------
+              // زر الحذف من Wishlist
+              // --------------------------
+              const removeBtn = clone.querySelector('.remove-from-wishlist-btn');
+              if (removeBtn) {
+              removeBtn.onclick = () => {
+                  removeBtn.disabled = true; // منع النقر المتكرر
+
+                  zid.account.removeFromWishlist(product.id)
+                  .then(() => {
+                      syncWishlistUI(product.id, false);
+              
+                  removeBtn.closest('.product-item')?.remove();
+
+                  
+                      if (!container.querySelector('.product-item')) {
+                      container.innerHTML = 
+                      `
+                          <div class="empty">
+                          <i class="fa fa-heart"></i>
+                          <p class="empty-text">  {{ _('No products in the wishlist') }}</p>
+                          </div>
+                      ;`;
+                      }
+                  })
+                  .catch(() => {
+                      removeBtn.disabled = false;
+                      alert('{{ _("حدث خطأ أثناء الحذف") }}');
+                  });
+              };
+              }
+
+              container.appendChild(clone);
+          });
+        })
       .catch((err) => {
         container.innerHTML = `
             <div class="empty">
